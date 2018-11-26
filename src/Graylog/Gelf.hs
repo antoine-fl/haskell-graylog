@@ -1,17 +1,20 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric      #-}
 {-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE RecordWildCards    #-}
 
 -- | Default formatting for Graylog messages,
 -- see http://docs.graylog.org/en/latest/pages/gelf.html
 module Graylog.Gelf where
 
-import           Data.Aeson        (ToJSON (..), Value (..), genericToJSON,
-                                    toJSON)
-import           Data.Aeson.Casing
-import           Data.Text         (Text)
+import           Data.Aeson          (ToJSON (..), Value (..), object,
+                                      toJSON, (.=))
+import           Data.HashMap.Strict (HashMap)
+import           Data.Semigroup      ((<>))
+import           Data.Text           (Text)
 import           Data.Time
 import           Data.Typeable
+import           GHC.Exts            (toList)
 import           GHC.Generics
 
 data GELF
@@ -24,11 +27,20 @@ data GELF
       , _gelfLevel        :: Maybe SyslogLevel
       , _gelfLine         :: Maybe Word
       , _gelfFile         :: Maybe Text
+      , _gelfMeta         :: HashMap Text Text
       }
    deriving (Show, Typeable, Generic)
 
 instance ToJSON GELF where
-   toJSON = genericToJSON $ aesonPrefix snakeCase
+  toJSON GELF{..} = object $ [ "version"        .= _gelfVersion
+                             , "host"           .= _gelfHost
+                             , "short_message"  .= _gelfShortMessage
+                             , "full_message"   .= _gelfFullMessage
+                             , "timestamp"      .= _gelfTimestamp
+                             , "level"          .= _gelfLevel
+                             , "line"           .= _gelfLine
+                             , "file"           .= _gelfFile
+                             ] <> toList (String <$> _gelfMeta)
 
 --
 
@@ -69,4 +81,4 @@ simpleGelf
    -> Text     -- ^ Short message
    -> GELF
 simpleGelf host short =
-   GELF Version1x1 host short Nothing Nothing Nothing Nothing Nothing
+  GELF Version1x1 host short Nothing Nothing Nothing Nothing Nothing mempty
