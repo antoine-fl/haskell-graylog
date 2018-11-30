@@ -7,9 +7,10 @@
 -- see http://docs.graylog.org/en/latest/pages/gelf.html
 module Graylog.Gelf where
 
-import           Data.Aeson          (ToJSON (..), Value (..), object,
-                                      toJSON, (.=))
+import           Data.Aeson          (ToJSON (..), Value (..), object, toJSON,
+                                      (.=))
 import           Data.HashMap.Strict (HashMap)
+import           Data.Scientific     (Scientific)
 import           Data.Semigroup      ((<>))
 import           Data.Text           (Text)
 import           Data.Time
@@ -27,9 +28,33 @@ data GELF
       , _gelfLevel        :: Maybe SyslogLevel
       , _gelfLine         :: Maybe Word
       , _gelfFile         :: Maybe Text
-      , _gelfMeta         :: HashMap Text Text
+      , _gelfMeta         :: HashMap Text MetaValue
       }
    deriving (Show, Typeable, Generic)
+
+data MetaValue
+  = TextValue Text
+  | NumberValue Scientific
+  deriving (Show)
+
+instance ToJSON MetaValue where
+  toJSON (TextValue txt) = toJSON txt
+  toJSON (NumberValue n) = toJSON n
+
+class ToMeta a where
+  toMeta :: a -> MetaValue
+
+instance ToMeta Text where
+  toMeta = TextValue
+
+instance ToMeta Scientific where
+  toMeta = NumberValue
+
+instance ToMeta Integer where
+  toMeta = NumberValue . fromInteger
+
+instance ToMeta Int where
+  toMeta = toMeta . toInteger
 
 instance ToJSON GELF where
   toJSON GELF{..} = object $ [ "version"        .= _gelfVersion
@@ -40,7 +65,7 @@ instance ToJSON GELF where
                              , "level"          .= _gelfLevel
                              , "line"           .= _gelfLine
                              , "file"           .= _gelfFile
-                             ] <> toList (String <$> _gelfMeta)
+                             ] <> toList (toJSON <$> _gelfMeta)
 
 --
 
