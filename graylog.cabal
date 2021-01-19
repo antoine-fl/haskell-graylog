@@ -34,6 +34,7 @@ library
                      ,  aeson-casing
                      ,  bytestring
                      ,  network
+                     ,  network-bsd
                      ,  random
                      ,  scientific
                      ,  text
