@@ -8,7 +8,6 @@ module Graylog.UDP
 import           Data.Aeson
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Lazy           as LBS
-import           Data.Monoid
 import           Data.Word
 import           Network.Socket.ByteString.Lazy
 import           System.Random

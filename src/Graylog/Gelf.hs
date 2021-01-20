@@ -11,7 +11,6 @@ import           Data.Aeson          (ToJSON (..), Value (..), object, toJSON,
                                       (.=))
 import           Data.HashMap.Strict (HashMap)
 import           Data.Scientific     (Scientific)
-import           Data.Semigroup      ((<>))
 import           Data.Text           (Text)
 import           Data.Time
 import           Data.Typeable
