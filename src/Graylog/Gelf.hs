@@ -7,14 +7,14 @@
 -- see http://docs.graylog.org/en/latest/pages/gelf.html
 module Graylog.Gelf where
 
-import           Data.Aeson          (ToJSON (..), Value (..), object, toJSON,
-                                      (.=))
-import           Data.HashMap.Strict (HashMap)
-import           Data.Scientific     (Scientific)
-import           Data.Text           (Text)
+import           Data.Aeson        (ToJSON (..), Value (..), object, toJSON,
+                                    (.=))
+import           Data.Aeson.KeyMap (KeyMap)
+import           Data.Scientific   (Scientific)
+import           Data.Text         (Text)
 import           Data.Time
 import           Data.Typeable
-import           GHC.Exts            (toList)
+import           GHC.Exts          (toList)
 import           GHC.Generics
 
 data GELF
@@ -27,7 +27,7 @@ data GELF
       , _gelfLevel        :: Maybe SyslogLevel
       , _gelfLine         :: Maybe Word
       , _gelfFile         :: Maybe Text
-      , _gelfMeta         :: HashMap Text MetaValue
+      , _gelfMeta         :: KeyMap MetaValue
       }
    deriving (Show, Typeable, Generic)
 
